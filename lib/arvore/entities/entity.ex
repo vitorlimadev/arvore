@@ -22,5 +22,6 @@ defmodule Arvore.Entities.Entity do
     entity
     |> cast(attrs, @required ++ @optional)
     |> validate_required(@required)
+    |> unique_constraint([:name, :entity_type])
   end
 end
