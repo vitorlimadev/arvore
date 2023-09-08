@@ -35,7 +35,8 @@ defmodule Arvore.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:absinthe, "~> 1.7.0"},
       {:absinthe_plug, "~> 1.5"},
-      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:ex_machina, "~> 2.7.0"}
     ]
   end
 
