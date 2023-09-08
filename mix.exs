@@ -16,7 +16,7 @@ defmodule Arvore.MixProject do
   def application do
     [
       mod: {Arvore.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:ex_machina, :logger, :runtime_tools]
     ]
   end
 
@@ -36,7 +36,7 @@ defmodule Arvore.MixProject do
       {:absinthe, "~> 1.7.0"},
       {:absinthe_plug, "~> 1.5"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
-      {:ex_machina, "~> 2.7.0"}
+      {:ex_machina, "~> 2.7.0", only: :test}
     ]
   end
 
