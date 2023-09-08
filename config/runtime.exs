@@ -21,18 +21,21 @@ if System.get_env("PHX_SERVER") do
 end
 
 if config_env() == :prod do
-  database_url =
-    System.get_env("DATABASE_URL") ||
-      raise """
-      environment variable DATABASE_URL is missing.
-      For example: ecto://USER:PASS@HOST/DATABASE
-      """
+  username = System.fetch_env!("MYSQL_USERNAME")
+  password = System.fetch_env!("MYSQL_PASSWORD")
+  hostname = System.fetch_env!("MYSQL_HOSTNAME")
+  database = System.fetch_env!("MYSQL_DATABASE")
 
   maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 
   config :arvore, Arvore.Repo,
     # ssl: true,
-    url: database_url,
+    username: username,
+    password: password,
+    hostname: hostname,
+    database: database,
+    stacktrace: true,
+    show_sensitive_data_on_connection_error: false,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
     socket_options: maybe_ipv6
 

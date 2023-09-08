@@ -2,10 +2,10 @@ import Config
 
 # Configure your database
 config :arvore, Arvore.Repo,
-  username: "root",
-  password: "",
+  username: "arvore",
+  password: "password",
   hostname: "localhost",
-  database: "arvore_dev",
+  database: "arvore",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
