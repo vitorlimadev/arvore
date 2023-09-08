@@ -5,8 +5,8 @@ defmodule Arvore.EntitiesTest do
   alias Arvore.Entities
   alias Arvore.Entities.Entity
 
-  describe "create_entity/1" do
-    test "creates and entity with valid params" do
+  describe "fetch_entity/1" do
+    test "fetches an existing entity" do
       entity = insert(:entity, %{name: "Test 1", entity_type: "school"})
 
       assert {:ok,
