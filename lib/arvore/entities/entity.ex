@@ -9,7 +9,7 @@ defmodule Arvore.Entities.Entity do
 
   schema "entities" do
     field :name, :string
-    field :entity_type, :string
+    field :entity_type, Ecto.Enum, values: [:network, :school, :class]
     field :inep, :string
     field :parent_id, :integer
     field :subtree_ids, {:array, :integer}, virtual: true

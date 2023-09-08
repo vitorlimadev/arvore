@@ -1,8 +1,8 @@
 defmodule ArvoreWeb.Schema do
   use Absinthe.Schema
-  import_types(ArvoreWeb.Schema.Entities)
-
   alias ArvoreWeb.Resolvers
+
+  import_types(ArvoreWeb.Schema.Entities)
 
   query do
     @desc "Fetches an Entity"
