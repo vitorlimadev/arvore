@@ -9,12 +9,13 @@ defmodule Arvore.EntitiesTest do
     test "creates and entity with valid params" do
       entity = insert(:entity, %{name: "Test 1", entity_type: "school"})
 
-      assert %Entity{
-               name: "Test 1",
-               entity_type: "school",
-               parent_id: nil,
-               subtree_ids: []
-             } = Entities.get_entity!(entity.id)
+      assert {:ok,
+              %Entity{
+                name: "Test 1",
+                entity_type: "school",
+                parent_id: nil,
+                subtree_ids: []
+              }} = Entities.fetch_entity(entity.id)
     end
   end
 end

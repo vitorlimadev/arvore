@@ -21,27 +21,25 @@ defmodule Arvore.Entities do
   Gets a single `Entity` and populate it's children's ids in `subtree_ids` virtual key.
   `subtree_ids` is populated with a recursive CTE.
 
-  Raises `Ecto.NoResultsError` if the Entity does not exist.
-
   ## Examples
 
-      iex> get_entity!(123)
-      %Entity{}
+      iex> fetch_entity(123)
+      {:ok, %Entity{}}
 
-      iex> get_entity!(456)
-      ** (Ecto.NoResultsError)
+      iex> fetch_entity(456)
+      {:error, :NOT_FOUND}
 
   """
-  @spec get_entity!(id :: Integer.t()) :: Entity.t()
-  def get_entity!(id) do
+  @spec fetch_entity(id :: Integer.t()) :: {:ok, Entity.t()} | {:error, :NOT_FOUND}
+  def fetch_entity(id) do
     case Repo.get(Entity, id) do
       %Entity{} = entity ->
         children = fetch_all_children(entity.id)
 
-        Map.put(entity, :subtree_ids, children)
+        {:ok, Map.put(entity, :subtree_ids, children)}
 
       nil ->
-        {:error, :ENTITY_NOT_FOUND}
+        {:error, :NOT_FOUND}
     end
   end
 
