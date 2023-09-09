@@ -17,10 +17,23 @@ defmodule ArvoreWeb.Schema.EntitiesTest do
     ) {
       id
       name
-      entity_type
+      entityType
       inep
-      parent_id
-      subtree_ids
+      parentId
+      subtreeIds
+    }
+  }
+  """
+
+  @fetch_entity_query """
+  query GetEntity($id: Int!) {
+    getEntity(id: $id) {
+      id
+      name
+      entityType
+      inep
+      parentId
+      subtreeIds
     }
   }
   """
@@ -41,9 +54,10 @@ defmodule ArvoreWeb.Schema.EntitiesTest do
                  "createEntity" => %{
                    "id" => _,
                    "name" => "Network 1",
-                   "parent_id" => nil,
+                   "entityType" => "network",
+                   "parentId" => nil,
                    "inep" => nil,
-                   "subtree_ids" => []
+                   "subtreeIds" => []
                  }
                }
              } = json_response(conn, 200)
@@ -69,7 +83,7 @@ defmodule ArvoreWeb.Schema.EntitiesTest do
                  "createEntity" => %{
                    "id" => _,
                    "name" => "School 1",
-                   "parent_id" => ^network_id
+                   "parentId" => ^network_id
                  }
                }
              } = json_response(conn, 200)
@@ -186,6 +200,212 @@ defmodule ArvoreWeb.Schema.EntitiesTest do
                  }
                ]
              } = json_response(conn, 200)
+    end
+  end
+
+  describe "fetch_entity sucess cases" do
+    test "fetches an existing entity", %{conn: conn} do
+      # SETUP
+
+      # Create a random type entity
+      %{
+        id: id,
+        name: name,
+        entity_type: entity_type,
+        inep: inep
+      } = insert(:entity)
+
+      entity_type = Atom.to_string(entity_type)
+
+      # EXECUTE
+      conn =
+        conn
+        |> post("/api", %{
+          "query" => @fetch_entity_query,
+          "variables" => %{id: id}
+        })
+
+      # ASSERT
+      assert %{
+               "data" => %{
+                 "getEntity" => %{
+                   "id" => ^id,
+                   "name" => ^name,
+                   "entityType" => ^entity_type,
+                   "parentId" => nil,
+                   "inep" => ^inep,
+                   "subtreeIds" => []
+                 }
+               }
+             } = json_response(conn, 200)
+    end
+
+    test "fetches correct parent_id", %{conn: conn} do
+      # SETUP
+
+      # Create the network parent
+      %{id: network_id} = insert(:entity, entity_type: "network")
+
+      # Create the fetched school
+      %{id: school_id} = insert(:entity, entity_type: "school", parent_id: network_id)
+
+      # EXECUTE
+      conn =
+        conn
+        |> post("/api", %{
+          "query" => @fetch_entity_query,
+          "variables" => %{id: school_id}
+        })
+
+      # ASSERT
+      assert %{
+               "data" => %{
+                 "getEntity" => %{
+                   "id" => ^school_id,
+                   "parentId" => ^network_id
+                 }
+               }
+             } = json_response(conn, 200)
+    end
+
+    test "fetches a child school id from a network's subtree", %{conn: conn} do
+      # SETUP
+
+      # Create the network
+      %{id: network_id} = insert(:entity, entity_type: "network")
+
+      # Create the child school
+      %{id: school_id} = insert(:entity, entity_type: "school", parent_id: network_id)
+
+      # EXECUTE
+      conn =
+        conn
+        |> post("/api", %{
+          "query" => @fetch_entity_query,
+          "variables" => %{id: network_id}
+        })
+
+      # ASSERT
+      assert %{
+               "data" => %{
+                 "getEntity" => %{
+                   "id" => ^network_id,
+                   "parentId" => nil,
+                   "subtreeIds" => [^school_id]
+                 }
+               }
+             } = json_response(conn, 200)
+    end
+
+    test "fetches a child class id from a schools's subtree", %{conn: conn} do
+      # SETUP
+
+      # Create the school
+      %{id: school_id} = insert(:entity, entity_type: "school")
+
+      # Create the child class
+      %{id: class_id} = insert(:entity, entity_type: "class", parent_id: school_id)
+
+      # EXECUTE
+      conn =
+        conn
+        |> post("/api", %{
+          "query" => @fetch_entity_query,
+          "variables" => %{id: school_id}
+        })
+
+      # ASSERT
+      assert %{
+               "data" => %{
+                 "getEntity" => %{
+                   "id" => ^school_id,
+                   "parentId" => nil,
+                   "subtreeIds" => [^class_id]
+                 }
+               }
+             } = json_response(conn, 200)
+    end
+
+    test "fetches multiple schools and classes from within a network subtree", %{conn: conn} do
+      # SETUP
+
+      # Create the fetched network
+      %{id: network_id} = insert(:entity, entity_type: "network")
+
+      # Create a random amount of schools and classes
+      schools_amount = 1..10 |> Enum.random()
+      classes_amount = 1..3 |> Enum.random()
+
+      subtree_ids =
+        Enum.map(1..schools_amount, fn _ ->
+          %{id: school_id} = insert(:entity, entity_type: "school", parent_id: network_id)
+
+          class_ids =
+            Enum.map(1..classes_amount, fn _ ->
+              %{id: class_id} = insert(:entity, entity_type: "class", parent_id: school_id)
+
+              class_id
+            end)
+
+          class_ids ++ [school_id]
+        end)
+        |> List.flatten()
+
+      # EXECUTE
+      conn =
+        conn
+        |> post("/api", %{
+          "query" => @fetch_entity_query,
+          "variables" => %{id: network_id}
+        })
+
+      # ASSERT
+      assert %{
+               "data" => %{
+                 "getEntity" => %{
+                   "id" => ^network_id,
+                   "parentId" => nil,
+                   "subtreeIds" => subtree_ids_response
+                 }
+               }
+             } = json_response(conn, 200)
+
+      assert Enum.sort(subtree_ids) == Enum.sort(subtree_ids_response)
+    end
+  end
+
+  describe "fetch_entity error cases" do
+    test "handles empty payload", %{conn: conn} do
+      # EXECUTE
+      conn =
+        conn
+        |> post("/api", %{
+          "query" => @fetch_entity_query,
+          "variables" => %{}
+        })
+
+      # ASSERT
+      assert %{
+               "errors" => [
+                 %{
+                   "message" => "In argument \"id\": Expected type \"Int!\", found null."
+                 }
+                 | _
+               ]
+             } = json_response(conn, 200)
+    end
+
+    test "handles entity not found", %{conn: conn} do
+      # EXECUTE
+      conn =
+        conn
+        |> post("/api", %{
+          "query" => @fetch_entity_query,
+          "variables" => %{id: 0}
+        })
+
+      # ASSERT
+      assert %{"errors" => [%{"message" => "NOT_FOUND"}]} = json_response(conn, 200)
     end
   end
 end
