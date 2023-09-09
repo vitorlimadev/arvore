@@ -4,7 +4,7 @@ defmodule ArvoreWeb.Resolvers.Entity do
   alias Arvore.Entities
 
   def fetch_entity(_parent, %{id: id}, _resolution) do
-    Arvore.Entities.fetch_entity(id)
+    Arvore.Entities.fetch_entity(id, fetch_children?: true)
   end
 
   def create_entity(_parent, params, _resolution) do

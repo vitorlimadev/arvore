@@ -36,18 +36,27 @@ defmodule Arvore.Entities do
       {:error, :NOT_FOUND}
 
   """
-  @spec fetch_entity(id :: Integer.t()) :: {:ok, Entity.t()} | {:error, :NOT_FOUND}
-  def fetch_entity(id) do
+  @spec fetch_entity(id :: Integer.t(), fetch_children? :: keyword()) ::
+          {:ok, Entity.t()} | {:error, :NOT_FOUND}
+  def fetch_entity(id, opts \\ []) do
+    fetch_children? = Keyword.get(opts, :fetch_children?, false)
+
     case Repo.get(Entity, id) do
       %Entity{} = entity ->
-        children = fetch_all_children(entity.id)
-
-        {:ok, Map.put(entity, :subtree_ids, children)}
+        build_entity(entity, fetch_children?)
 
       nil ->
         {:error, :NOT_FOUND}
     end
   end
+
+  defp build_entity(entity, true) do
+    children = fetch_all_children(entity.id)
+
+    {:ok, Map.put(entity, :subtree_ids, children)}
+  end
+
+  defp build_entity(entity, false), do: {:ok, entity}
 
   defp fetch_all_children(entity_id) do
     recursive_cte = """
