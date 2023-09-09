@@ -106,4 +106,16 @@ defmodule Arvore.Entities do
     |> Entity.changeset(attrs)
     |> Repo.update()
   end
+
+  @doc """
+  Checks if an entity exists in the database.
+
+  ## Examples
+
+      iex> exists?(entity_id)
+      true
+
+  """
+  @spec exists?(id :: Integer.t()) :: boolean()
+  def exists?(id), do: Repo.exists?(Entity, id: id)
 end
