@@ -19,8 +19,10 @@ defmodule ArvoreWeb.Resolvers.Entity do
     end
   end
 
-  defp parse_result({:error, %Ecto.Changeset{valid?: false} = changeset}) do
-    {:error, "#{inspect(changeset.errors)}"}
+  defp parse_result({:error, %Ecto.Changeset{valid?: false, errors: errors}}) do
+    error_list = Enum.map(errors, fn {key, {message, _}} -> {key, message} end)
+
+    {:error, "#{inspect(error_list)}"}
   end
 
   defp parse_result(result), do: result

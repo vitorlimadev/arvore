@@ -113,7 +113,7 @@ defmodule ArvoreWeb.Schema.EntitiesTest do
       # ASSERT
       assert %{
                "errors" => [
-                 %{"message" => "[parent_id: {\"Parent not found.\", []}]"}
+                 %{"message" => "[parent_id: \"Parent not found.\"]"}
                ]
              } = json_response(conn, 200)
     end
@@ -135,7 +135,7 @@ defmodule ArvoreWeb.Schema.EntitiesTest do
       # ASSERT
       assert %{
                "errors" => [
-                 %{"message" => "[parent_id: {\"Networks can't have parent entities.\", []}]"}
+                 %{"message" => "[parent_id: \"Networks can't have parent entities.\"]"}
                ]
              } = json_response(conn, 200)
     end
@@ -158,7 +158,7 @@ defmodule ArvoreWeb.Schema.EntitiesTest do
       assert %{
                "errors" => [
                  %{
-                   "message" => "[parent_id: {\"Schools can only be children of networks.\", []}]"
+                   "message" => "[parent_id: \"Schools can only be children of networks.\"]"
                  }
                ]
              } = json_response(conn, 200)
@@ -182,7 +182,7 @@ defmodule ArvoreWeb.Schema.EntitiesTest do
       assert %{
                "errors" => [
                  %{
-                   "message" => "[parent_id: {\"Classes can only be children of schools.\", []}]"
+                   "message" => "[parent_id: \"Classes can only be children of schools.\"]"
                  }
                ]
              } = json_response(conn, 200)
