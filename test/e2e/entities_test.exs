@@ -1,4 +1,4 @@
-defmodule ArvoreWeb.Schema.EntitiesTest do
+defmodule EntitiesTest do
   use ArvoreWeb.ConnCase, async: true
   import Arvore.Factory
 
