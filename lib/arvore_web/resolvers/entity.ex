@@ -1,4 +1,6 @@
 defmodule ArvoreWeb.Resolvers.Entity do
+  @moduledoc false
+
   alias Arvore.Entities
 
   def fetch_entity(_parent, %{id: id}, _resolution) do

@@ -1,4 +1,6 @@
 defmodule ArvoreWeb.Schema do
+  @moduledoc false
+
   use Absinthe.Schema
   alias ArvoreWeb.Resolvers
 

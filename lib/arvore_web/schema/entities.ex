@@ -1,4 +1,6 @@
 defmodule ArvoreWeb.Schema.Entities do
+  @moduledoc false
+
   use Absinthe.Schema.Notation
 
   object :entity do

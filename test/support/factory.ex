@@ -1,4 +1,6 @@
 defmodule Arvore.Factory do
+  @moduledoc false
+
   use ExMachina.Ecto, repo: Arvore.Repo
 
   def entity_factory do
