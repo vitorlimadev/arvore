@@ -10,6 +10,12 @@ defmodule Arvore.Entities do
   * A `school` may have only one `network` as parent, and many `classes` as children.
 
   * A `class` may have only one `school` as parent and no children.
+
+  The `subtree_ids` key must contain the ids of all the entity's children, and their children
+  recursively.
+
+  Ex: A network has 100 schools, and each school has 1 to 10 classes. `subtree_ids` must contain the
+  ids of all related schools and classes.
   """
 
   import Ecto.Query, warn: false
