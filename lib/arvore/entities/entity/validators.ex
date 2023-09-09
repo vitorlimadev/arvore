@@ -3,6 +3,7 @@ defmodule Arvore.Entities.Entity.Validators do
 
   alias Arvore.Entities
 
+  @doc "Ensures parent exists on the database."
   def validate_parent_existance(changeset) do
     Ecto.Changeset.validate_change(changeset, :parent_id, fn
       _field, nil ->
@@ -17,6 +18,12 @@ defmodule Arvore.Entities.Entity.Validators do
     end)
   end
 
+  @doc """
+  Ensures parent hierarchy is respected. See `Arvore.Entities` for hierarchy details.
+
+  This check queries the database to get the parent's data. Changeset will be invalid already if
+  parent existance validation fails, therefore it is skipped in this case.
+  """
   def validate_parent_cohesion(changeset) when changeset.valid? == true do
     Ecto.Changeset.validate_change(changeset, :parent_id, fn
       _field, nil ->
@@ -29,7 +36,6 @@ defmodule Arvore.Entities.Entity.Validators do
     end)
   end
 
-  # Changeset will be invalid already if parent existance validation fails.
   def validate_parent_cohesion(changeset), do: changeset
 
   defp ensure_parent_cohesion(_parent_id, :network),
@@ -53,5 +59,22 @@ defmodule Arvore.Entities.Entity.Validators do
       {:ok, %{entity_type: _}} ->
         [{:parent_id, "Classes can only be children of schools."}]
     end
+  end
+
+  @doc "Ensures INEP is only present in schools."
+  def validate_inep(changeset) do
+    Ecto.Changeset.validate_change(changeset, :inep, fn
+      _field, nil ->
+        []
+
+      _field, _inep ->
+        entity_type = Ecto.Changeset.get_field(changeset, :entity_type)
+
+        if entity_type == :school do
+          []
+        else
+          [{:inep, "Only schools can have INEP."}]
+        end
+    end)
   end
 end

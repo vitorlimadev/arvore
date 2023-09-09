@@ -9,7 +9,8 @@ defmodule Arvore.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      test_coverage: test_coverage()
     ]
   end
 
@@ -46,6 +47,26 @@ defmodule Arvore.MixProject do
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"]
+    ]
+  end
+
+  defp test_coverage do
+    [
+      ignore_modules: [
+        # Auto generated/Coverage noise
+        Arvore.Application,
+        Arvore.DataCase,
+        Arvore.Factory,
+        Arvore.Release,
+        Arvore.Repo,
+        ArvoreWeb.ConnCase,
+        ArvoreWeb.Endpoint,
+        ArvoreWeb.Router,
+        ArvoreWeb.Telemetry,
+        # GraphQL schemas
+        ArvoreWeb.Schema.Entities,
+        ArvoreWeb.Schema.Compiled
+      ]
     ]
   end
 end

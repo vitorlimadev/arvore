@@ -25,7 +25,32 @@ defmodule EntitiesTest do
   }
   """
 
-  @fetch_entity_query """
+  @update_entity_mutation """
+    mutation UpdateEntity(
+      $id: Int!,
+      $name: String,
+      $entityType: String,
+      $inep: String,
+      $parentId: Int,
+    ) {
+    updateEntity(
+      id: $id,
+      name: $name,
+      entityType: $entityType, 
+      inep: $inep,
+      parent_id: $parentId
+    ) {
+      id
+      name
+      entityType
+      inep
+      parentId
+      subtreeIds
+    }
+  }
+  """
+
+  @get_entity_query """
   query GetEntity($id: Int!) {
     getEntity(id: $id) {
       id
@@ -115,6 +140,27 @@ defmodule EntitiesTest do
              } = json_response(conn, 200)
     end
 
+    test "fails when creating a entity other than a school with INEP", %{conn: conn} do
+      # EXECUTE
+      conn =
+        conn
+        |> post("/api", %{
+          "query" => @create_entity_mutation,
+          "variables" => %{
+            name: "Entity 1",
+            entityType: Enum.random(["network", "class"]),
+            inep: "12345678"
+          }
+        })
+
+      # ASSERT
+      assert %{
+               "errors" => [
+                 %{"message" => "[inep: \"Only schools can have INEP.\"]"}
+               ]
+             } = json_response(conn, 200)
+    end
+
     test "fails when creating a entity with a non-existing parent", %{conn: conn} do
       # EXECUTE
       conn =
@@ -135,7 +181,7 @@ defmodule EntitiesTest do
     test "ensures networks have no parents", %{conn: conn} do
       # SETUP
 
-      # Create the parent network
+      # Create the invalid parent
       %{id: network_id} = insert(:entity, entity_type: "network")
 
       # EXECUTE
@@ -154,7 +200,7 @@ defmodule EntitiesTest do
              } = json_response(conn, 200)
     end
 
-    test "ensures schools can have only networks as parents", %{conn: conn} do
+    test "ensures schools can only have networks as parents", %{conn: conn} do
       # SETUP
 
       # Create the invalid parent
@@ -178,7 +224,7 @@ defmodule EntitiesTest do
              } = json_response(conn, 200)
     end
 
-    test "ensures classes can have only schools as parents", %{conn: conn} do
+    test "ensures classes can only have schools as parents", %{conn: conn} do
       # SETUP
 
       # Create the invalid parent
@@ -190,6 +236,244 @@ defmodule EntitiesTest do
         |> post("/api", %{
           "query" => @create_entity_mutation,
           "variables" => %{name: "Class 2", entityType: "class", parentId: invalid_parent_id}
+        })
+
+      # ASSERT
+      assert %{
+               "errors" => [
+                 %{
+                   "message" => "[parent_id: \"Classes can only be children of schools.\"]"
+                 }
+               ]
+             } = json_response(conn, 200)
+    end
+  end
+
+  describe "update_entity sucess cases" do
+    test "updates an entity's name", %{conn: conn} do
+      # SETUP
+      %{id: entity_id} = insert(:entity)
+      new_name = "Updated Name"
+
+      # EXECUTE
+      conn =
+        conn
+        |> post("/api", %{
+          "query" => @update_entity_mutation,
+          "variables" => %{id: entity_id, name: new_name}
+        })
+
+      # ASSERT
+      assert %{
+               "data" => %{
+                 "updateEntity" => %{
+                   "id" => ^entity_id,
+                   "name" => ^new_name
+                 }
+               }
+             } = json_response(conn, 200)
+    end
+
+    test "updates a school's INEP", %{conn: conn} do
+      # SETUP
+      %{id: school_id} = insert(:entity, entity_type: "school")
+      new_inep = "12345678"
+
+      # EXECUTE
+      conn =
+        conn
+        |> post("/api", %{
+          "query" => @update_entity_mutation,
+          "variables" => %{id: school_id, inep: new_inep}
+        })
+
+      # ASSERT
+      assert %{
+               "data" => %{
+                 "updateEntity" => %{
+                   "id" => ^school_id,
+                   "inep" => ^new_inep
+                 }
+               }
+             } = json_response(conn, 200)
+    end
+
+    test "updates a school's parent network", %{conn: conn} do
+      # SETUP
+
+      # Create the original school's network
+      %{id: network_1_id} = insert(:entity, entity_type: "network")
+
+      # Create the school to be updated
+      %{id: school_id} = insert(:entity, entity_type: "school", parent_id: network_1_id)
+
+      # Create a new network
+      %{id: network_2_id} = insert(:entity, entity_type: "network")
+
+      # EXECUTE
+      conn =
+        conn
+        |> post("/api", %{
+          "query" => @update_entity_mutation,
+          "variables" => %{id: school_id, parentId: network_2_id}
+        })
+
+      # ASSERT
+      assert %{
+               "data" => %{
+                 "updateEntity" => %{
+                   "id" => ^school_id,
+                   "parentId" => ^network_2_id
+                 }
+               }
+             } = json_response(conn, 200)
+    end
+
+    test "updates a class' parent school", %{conn: conn} do
+      # SETUP
+
+      # Create the original class' school
+      %{id: school_1_id} = insert(:entity, entity_type: "school")
+
+      # Create the school to be updated
+      %{id: class_id} = insert(:entity, entity_type: "class", parent_id: school_1_id)
+
+      # Create a new school
+      %{id: school_2_id} = insert(:entity, entity_type: "school")
+
+      # EXECUTE
+      conn =
+        conn
+        |> post("/api", %{
+          "query" => @update_entity_mutation,
+          "variables" => %{id: class_id, parentId: school_2_id}
+        })
+
+      # ASSERT
+      assert %{
+               "data" => %{
+                 "updateEntity" => %{
+                   "id" => ^class_id,
+                   "parentId" => ^school_2_id
+                 }
+               }
+             } = json_response(conn, 200)
+    end
+  end
+
+  describe "update_entity error cases" do
+    test "handles empty payload", %{conn: conn} do
+      # EXECUTE
+      conn =
+        conn
+        |> post("/api", %{
+          "query" => @update_entity_mutation,
+          "variables" => %{}
+        })
+
+      # ASSERT
+      assert %{
+               "errors" => [
+                 %{
+                   "message" => "In argument \"id\": Expected type \"Int!\", found null."
+                 }
+                 | _
+               ]
+             } = json_response(conn, 200)
+    end
+
+    test "ensures other entities can't update their INEP", %{conn: conn} do
+      # SETUP
+
+      # Create either a network or class
+      %{id: entity_id} = insert(:entity, entity_type: Enum.random(["network", "class"]))
+
+      # EXECUTE
+      conn =
+        conn
+        |> post("/api", %{
+          "query" => @update_entity_mutation,
+          "variables" => %{id: entity_id, inep: "12345678"}
+        })
+
+      # ASSERT
+      assert %{
+               "errors" => [
+                 %{
+                   "message" => "[inep: \"Only schools can have INEP.\"]"
+                 }
+                 | _
+               ]
+             } = json_response(conn, 200)
+    end
+
+    test "ensures networks can't add parent_id", %{conn: conn} do
+      # SETUP
+
+      # Create the invalid parent
+      %{id: network_1_id} = insert(:entity, entity_type: "network")
+
+      # Create the network to update
+      %{id: network_2_id} = insert(:entity, entity_type: "network")
+
+      # EXECUTE
+      conn =
+        conn
+        |> post("/api", %{
+          "query" => @update_entity_mutation,
+          "variables" => %{id: network_1_id, parentId: network_2_id}
+        })
+
+      # ASSERT
+      assert %{
+               "errors" => [
+                 %{"message" => "[parent_id: \"Networks can't have parent entities.\"]"}
+               ]
+             } = json_response(conn, 200)
+    end
+
+    test "ensures schools can only have networks as parents", %{conn: conn} do
+      # SETUP
+
+      # Create the invalid parent
+      %{id: invalid_parent_id} = insert(:entity, entity_type: Enum.random(["school", "class"]))
+
+      # Create the school to update
+      %{id: school_id} = insert(:entity, entity_type: "school")
+
+      # EXECUTE
+      conn =
+        conn
+        |> post("/api", %{
+          "query" => @update_entity_mutation,
+          "variables" => %{id: school_id, parentId: invalid_parent_id}
+        })
+
+      # ASSERT
+      assert %{
+               "errors" => [
+                 %{
+                   "message" => "[parent_id: \"Schools can only be children of networks.\"]"
+                 }
+               ]
+             } = json_response(conn, 200)
+    end
+
+    test "ensures classes can only have schools as parents", %{conn: conn} do
+      # SETUP
+
+      # Create the invalid parent
+      %{id: invalid_parent_id} = insert(:entity, entity_type: Enum.random(["network", "class"]))
+
+      # Create the class to update
+      %{id: class_id} = insert(:entity, entity_type: "class")
+
+      # EXECUTE
+      conn =
+        conn
+        |> post("/api", %{
+          "query" => @update_entity_mutation,
+          "variables" => %{id: class_id, parentId: invalid_parent_id}
         })
 
       # ASSERT
@@ -221,7 +505,7 @@ defmodule EntitiesTest do
       conn =
         conn
         |> post("/api", %{
-          "query" => @fetch_entity_query,
+          "query" => @get_entity_query,
           "variables" => %{id: id}
         })
 
@@ -253,7 +537,7 @@ defmodule EntitiesTest do
       conn =
         conn
         |> post("/api", %{
-          "query" => @fetch_entity_query,
+          "query" => @get_entity_query,
           "variables" => %{id: school_id}
         })
 
@@ -281,7 +565,7 @@ defmodule EntitiesTest do
       conn =
         conn
         |> post("/api", %{
-          "query" => @fetch_entity_query,
+          "query" => @get_entity_query,
           "variables" => %{id: network_id}
         })
 
@@ -310,7 +594,7 @@ defmodule EntitiesTest do
       conn =
         conn
         |> post("/api", %{
-          "query" => @fetch_entity_query,
+          "query" => @get_entity_query,
           "variables" => %{id: school_id}
         })
 
@@ -355,7 +639,7 @@ defmodule EntitiesTest do
       conn =
         conn
         |> post("/api", %{
-          "query" => @fetch_entity_query,
+          "query" => @get_entity_query,
           "variables" => %{id: network_id}
         })
 
@@ -380,7 +664,7 @@ defmodule EntitiesTest do
       conn =
         conn
         |> post("/api", %{
-          "query" => @fetch_entity_query,
+          "query" => @get_entity_query,
           "variables" => %{}
         })
 
@@ -400,7 +684,7 @@ defmodule EntitiesTest do
       conn =
         conn
         |> post("/api", %{
-          "query" => @fetch_entity_query,
+          "query" => @get_entity_query,
           "variables" => %{id: 0}
         })
 

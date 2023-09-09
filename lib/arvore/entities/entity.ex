@@ -25,6 +25,7 @@ defmodule Arvore.Entities.Entity do
     |> validate_required(@required)
     |> validate_parent_existance()
     |> validate_parent_cohesion()
+    |> validate_inep()
     |> unique_constraint([:name, :entity_type])
   end
 end
