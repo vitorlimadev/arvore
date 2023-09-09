@@ -11,7 +11,7 @@ if config_env() == :prod do
   database = System.fetch_env!("MYSQL_DATABASE")
 
   config :arvore, Arvore.Repo,
-    # ssl: true,
+    ssl: true,
     username: username,
     password: password,
     hostname: hostname,
@@ -37,7 +37,8 @@ if config_env() == :prod do
       ip: {0, 0, 0, 0, 0, 0, 0, 0},
       port: port
     ],
-    secret_key_base: secret_key_base
+    secret_key_base: secret_key_base,
+    api_key: System.fetch_env!("API_KEY")
 
   config :arvore, ArvoreWeb.Endpoint, force_ssl: [hsts: true]
 end

@@ -18,7 +18,8 @@ config :arvore, Arvore.Repo,
 config :arvore, ArvoreWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
   secret_key_base: "ZSd5daVFdL+AwQM3iRVrpUGRqY98VLIRnUQ1LXu/Prmmqq09ZLxM+4f+tShMN3bJ",
-  server: false
+  server: false,
+  api_key: "test_key"
 
 # Print only warnings and errors during test
 config :logger, level: :warning

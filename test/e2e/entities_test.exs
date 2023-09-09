@@ -68,6 +68,7 @@ defmodule EntitiesTest do
       # EXECUTE
       conn =
         conn
+        |> put_req_header("x-api-key", "test_key")
         |> post("/api", %{
           "query" => @create_entity_mutation,
           "variables" => %{name: "Network 1", entityType: "network"}
@@ -97,6 +98,7 @@ defmodule EntitiesTest do
       # EXECUTE
       conn =
         conn
+        |> put_req_header("x-api-key", "test_key")
         |> post("/api", %{
           "query" => @create_entity_mutation,
           "variables" => %{name: "School 1", entityType: "school", parentId: network_id}
@@ -120,6 +122,7 @@ defmodule EntitiesTest do
       # EXECUTE
       conn =
         conn
+        |> put_req_header("x-api-key", "test_key")
         |> post("/api", %{
           "query" => @create_entity_mutation,
           "variables" => %{}
@@ -144,6 +147,7 @@ defmodule EntitiesTest do
       # EXECUTE
       conn =
         conn
+        |> put_req_header("x-api-key", "test_key")
         |> post("/api", %{
           "query" => @create_entity_mutation,
           "variables" => %{
@@ -165,6 +169,7 @@ defmodule EntitiesTest do
       # EXECUTE
       conn =
         conn
+        |> put_req_header("x-api-key", "test_key")
         |> post("/api", %{
           "query" => @create_entity_mutation,
           "variables" => %{name: "School 1", entityType: "school", parentId: 1}
@@ -187,6 +192,7 @@ defmodule EntitiesTest do
       # EXECUTE
       conn =
         conn
+        |> put_req_header("x-api-key", "test_key")
         |> post("/api", %{
           "query" => @create_entity_mutation,
           "variables" => %{name: "Network 1", entityType: "network", parentId: network_id}
@@ -209,6 +215,7 @@ defmodule EntitiesTest do
       # EXECUTE
       conn =
         conn
+        |> put_req_header("x-api-key", "test_key")
         |> post("/api", %{
           "query" => @create_entity_mutation,
           "variables" => %{name: "School 2", entityType: "school", parentId: invalid_parent_id}
@@ -233,6 +240,7 @@ defmodule EntitiesTest do
       # EXECUTE
       conn =
         conn
+        |> put_req_header("x-api-key", "test_key")
         |> post("/api", %{
           "query" => @create_entity_mutation,
           "variables" => %{name: "Class 2", entityType: "class", parentId: invalid_parent_id}
@@ -258,6 +266,7 @@ defmodule EntitiesTest do
       # EXECUTE
       conn =
         conn
+        |> put_req_header("x-api-key", "test_key")
         |> post("/api", %{
           "query" => @update_entity_mutation,
           "variables" => %{id: entity_id, name: new_name}
@@ -282,6 +291,7 @@ defmodule EntitiesTest do
       # EXECUTE
       conn =
         conn
+        |> put_req_header("x-api-key", "test_key")
         |> post("/api", %{
           "query" => @update_entity_mutation,
           "variables" => %{id: school_id, inep: new_inep}
@@ -313,6 +323,7 @@ defmodule EntitiesTest do
       # EXECUTE
       conn =
         conn
+        |> put_req_header("x-api-key", "test_key")
         |> post("/api", %{
           "query" => @update_entity_mutation,
           "variables" => %{id: school_id, parentId: network_2_id}
@@ -344,6 +355,7 @@ defmodule EntitiesTest do
       # EXECUTE
       conn =
         conn
+        |> put_req_header("x-api-key", "test_key")
         |> post("/api", %{
           "query" => @update_entity_mutation,
           "variables" => %{id: class_id, parentId: school_2_id}
@@ -366,6 +378,7 @@ defmodule EntitiesTest do
       # EXECUTE
       conn =
         conn
+        |> put_req_header("x-api-key", "test_key")
         |> post("/api", %{
           "query" => @update_entity_mutation,
           "variables" => %{}
@@ -391,6 +404,7 @@ defmodule EntitiesTest do
       # EXECUTE
       conn =
         conn
+        |> put_req_header("x-api-key", "test_key")
         |> post("/api", %{
           "query" => @update_entity_mutation,
           "variables" => %{id: entity_id, inep: "12345678"}
@@ -419,6 +433,7 @@ defmodule EntitiesTest do
       # EXECUTE
       conn =
         conn
+        |> put_req_header("x-api-key", "test_key")
         |> post("/api", %{
           "query" => @update_entity_mutation,
           "variables" => %{id: network_1_id, parentId: network_2_id}
@@ -444,6 +459,7 @@ defmodule EntitiesTest do
       # EXECUTE
       conn =
         conn
+        |> put_req_header("x-api-key", "test_key")
         |> post("/api", %{
           "query" => @update_entity_mutation,
           "variables" => %{id: school_id, parentId: invalid_parent_id}
@@ -471,6 +487,7 @@ defmodule EntitiesTest do
       # EXECUTE
       conn =
         conn
+        |> put_req_header("x-api-key", "test_key")
         |> post("/api", %{
           "query" => @update_entity_mutation,
           "variables" => %{id: class_id, parentId: invalid_parent_id}
@@ -504,6 +521,7 @@ defmodule EntitiesTest do
       # EXECUTE
       conn =
         conn
+        |> put_req_header("x-api-key", "test_key")
         |> post("/api", %{
           "query" => @get_entity_query,
           "variables" => %{id: id}
@@ -536,6 +554,7 @@ defmodule EntitiesTest do
       # EXECUTE
       conn =
         conn
+        |> put_req_header("x-api-key", "test_key")
         |> post("/api", %{
           "query" => @get_entity_query,
           "variables" => %{id: school_id}
@@ -564,6 +583,7 @@ defmodule EntitiesTest do
       # EXECUTE
       conn =
         conn
+        |> put_req_header("x-api-key", "test_key")
         |> post("/api", %{
           "query" => @get_entity_query,
           "variables" => %{id: network_id}
@@ -593,6 +613,7 @@ defmodule EntitiesTest do
       # EXECUTE
       conn =
         conn
+        |> put_req_header("x-api-key", "test_key")
         |> post("/api", %{
           "query" => @get_entity_query,
           "variables" => %{id: school_id}
@@ -638,6 +659,7 @@ defmodule EntitiesTest do
       # EXECUTE
       conn =
         conn
+        |> put_req_header("x-api-key", "test_key")
         |> post("/api", %{
           "query" => @get_entity_query,
           "variables" => %{id: network_id}
@@ -663,6 +685,7 @@ defmodule EntitiesTest do
       # EXECUTE
       conn =
         conn
+        |> put_req_header("x-api-key", "test_key")
         |> post("/api", %{
           "query" => @get_entity_query,
           "variables" => %{}
@@ -683,6 +706,7 @@ defmodule EntitiesTest do
       # EXECUTE
       conn =
         conn
+        |> put_req_header("x-api-key", "test_key")
         |> post("/api", %{
           "query" => @get_entity_query,
           "variables" => %{id: 0}
@@ -691,5 +715,13 @@ defmodule EntitiesTest do
       # ASSERT
       assert %{"errors" => [%{"message" => "NOT_FOUND"}]} = json_response(conn, 200)
     end
+  end
+
+  test "unauthorizes any request without API key", %{conn: conn} do
+    # EXECUTE
+    conn = post(conn, "/api", %{})
+
+    # ASSERT
+    assert "Unauthorized" = response(conn, 401)
   end
 end
