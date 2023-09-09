@@ -6,9 +6,6 @@ defmodule Arvore.Entities.Entity.Validators do
   @doc "Ensures parent exists on the database."
   def validate_parent_existance(changeset) do
     Ecto.Changeset.validate_change(changeset, :parent_id, fn
-      _field, nil ->
-        []
-
       _field, parent_id ->
         if Entities.exists?(parent_id) do
           []
@@ -26,9 +23,6 @@ defmodule Arvore.Entities.Entity.Validators do
   """
   def validate_parent_cohesion(changeset) when changeset.valid? == true do
     Ecto.Changeset.validate_change(changeset, :parent_id, fn
-      _field, nil ->
-        []
-
       _field, parent_id ->
         entity_type = Ecto.Changeset.get_field(changeset, :entity_type)
 
@@ -64,9 +58,6 @@ defmodule Arvore.Entities.Entity.Validators do
   @doc "Ensures INEP is only present in schools."
   def validate_inep(changeset) do
     Ecto.Changeset.validate_change(changeset, :inep, fn
-      _field, nil ->
-        []
-
       _field, _inep ->
         entity_type = Ecto.Changeset.get_field(changeset, :entity_type)
 

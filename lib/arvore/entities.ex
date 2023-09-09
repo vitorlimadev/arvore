@@ -90,6 +90,8 @@ defmodule Arvore.Entities do
   @doc """
   Updates a entity.
 
+  `entity_type` cannot be updated, as it would break parental hierarchy.
+
   ## Examples
 
       iex> update_entity(entity, %{name: "new_name"})
@@ -102,6 +104,8 @@ defmodule Arvore.Entities do
   @spec update_entity(entity :: Entity.t(), attrs :: map()) ::
           {:ok, Entity.t()} | {:error, Ecto.Changeset.t()}
   def update_entity(%Entity{} = entity, attrs) do
+    attrs = Map.drop(attrs, [:entity_type])
+
     entity
     |> Entity.changeset(attrs)
     |> Repo.update()
