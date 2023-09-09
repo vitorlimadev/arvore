@@ -617,8 +617,8 @@ defmodule EntitiesTest do
       %{id: network_id} = insert(:entity, entity_type: "network")
 
       # Create a random amount of schools and classes
-      schools_amount = 1..10 |> Enum.random()
-      classes_amount = 1..3 |> Enum.random()
+      schools_amount = 1..1_000 |> Enum.random()
+      classes_amount = 1..20 |> Enum.random()
 
       subtree_ids =
         Enum.map(1..schools_amount, fn _ ->
