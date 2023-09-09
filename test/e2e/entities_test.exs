@@ -346,7 +346,7 @@ defmodule EntitiesTest do
       # Create the original class' school
       %{id: school_1_id} = insert(:entity, entity_type: "school")
 
-      # Create the school to be updated
+      # Create the class to be updated
       %{id: class_id} = insert(:entity, entity_type: "class", parent_id: school_1_id)
 
       # Create a new school
@@ -655,6 +655,21 @@ defmodule EntitiesTest do
           class_ids ++ [school_id]
         end)
         |> List.flatten()
+
+      # Create a second network. No parents from this one must be in the response.
+      %{id: network_2_id} = insert(:entity, entity_type: "network")
+
+      # Create a random amount of schools and classes for the second network
+      schools_amount_2 = 1..5 |> Enum.random()
+      classes_amount_2 = 1..3 |> Enum.random()
+
+      Enum.map(1..schools_amount_2, fn _ ->
+        %{id: school_id} = insert(:entity, entity_type: "school", parent_id: network_2_id)
+
+        Enum.map(1..classes_amount_2, fn _ ->
+          insert(:entity, entity_type: "class", parent_id: school_id)
+        end)
+      end)
 
       # EXECUTE
       conn =
