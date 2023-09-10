@@ -11,7 +11,5 @@ defmodule ArvoreWeb.Endpoint do
     pass: ["*/*"],
     json_decoder: Phoenix.json_library()
 
-  plug ArvoreWeb.Authentication
-
   plug ArvoreWeb.Router
 end

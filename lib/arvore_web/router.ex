@@ -4,13 +4,16 @@ defmodule ArvoreWeb.Router do
   use ArvoreWeb, :router
 
   pipeline :api do
-    plug :accepts, ["json"]
+    plug ArvoreWeb.Authentication
   end
 
   scope "/api" do
     pipe_through :api
 
-    forward "/graphql", Absinthe.Plug.GraphiQL, schema: ArvoreWeb.Schema
     forward "/", Absinthe.Plug, schema: ArvoreWeb.Schema
+  end
+
+  if Mix.env() == :dev do
+    forward "/graphql", Absinthe.Plug.GraphiQL, schema: ArvoreWeb.Schema
   end
 end
