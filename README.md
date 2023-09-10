@@ -26,7 +26,12 @@ interactive GraphQL interface.
 
 ## API
 
-A GraphQL api is exposed at `/api` with the following queries:
+A GraphQL API is exposed at `/api`.
+
+To authenticate your local requests use the `x-api-key` header with `test_key` as value. The same is
+required to run queries via the interactive GraphQL interface.
+
+The following queries are available:
 
 ### Create Entity
 
