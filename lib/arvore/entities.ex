@@ -24,7 +24,9 @@ defmodule Arvore.Entities do
   alias Arvore.Repo
 
   @doc """
-  Gets a single `Entity` and populate it's children's ids in `subtree_ids` virtual key.
+  Gets a single `Entity`.
+
+  Populate it's children's ids in `subtree_ids` virtual key if `fetch_children?` opt is `true`.
   `subtree_ids` is populated with a recursive CTE.
 
   ## Examples
@@ -32,11 +34,14 @@ defmodule Arvore.Entities do
       iex> fetch_entity(123)
       {:ok, %Entity{}}
 
+      iex> fetch_entity(123, fetch_children?: true)
+      {:ok, %Entity{subtree_ids: [124, 125]}}
+
       iex> fetch_entity(456)
       {:error, :NOT_FOUND}
 
   """
-  @spec fetch_entity(id :: Integer.t(), fetch_children? :: keyword()) ::
+  @spec fetch_entity(id :: Integer.t(), opts :: keyword()) ::
           {:ok, Entity.t()} | {:error, :NOT_FOUND}
   def fetch_entity(id, opts \\ []) do
     fetch_children? = Keyword.get(opts, :fetch_children?, false)

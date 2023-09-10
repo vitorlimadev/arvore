@@ -19,7 +19,9 @@ defmodule Arvore.Entities.Entity.Validators do
   Ensures parent hierarchy is respected. See `Arvore.Entities` for hierarchy details.
 
   This check queries the database to get the parent's data. Changeset will be invalid already if
-  parent existance validation fails, therefore it is skipped in this case.
+  parent existance validation fails, therefore it is skipped in this case to improve performance.
+
+  Never call `validate_parent_cohesion/1` before calling `validate_parent_existance/1`.
   """
   def validate_parent_cohesion(changeset) when changeset.valid? == true do
     Ecto.Changeset.validate_change(changeset, :parent_id, fn
