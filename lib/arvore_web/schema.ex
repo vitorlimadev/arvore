@@ -30,7 +30,6 @@ defmodule ArvoreWeb.Schema do
     field :update_entity, :entity do
       arg(:id, non_null(:integer))
       arg(:name, :string)
-      arg(:entity_type, :string)
       arg(:parent_id, :integer)
       arg(:inep, :string)
 
