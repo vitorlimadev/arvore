@@ -80,7 +80,9 @@ defmodule Arvore.Entities do
     # and we don't want it's own id in it's `subtree_ids`.
     %{rows: [_ | result]} = Repo.query!(recursive_cte)
 
-    Enum.map(result, fn [id, _parent_id] -> id end)
+    result
+    |> Enum.map(fn [id, _parent_id] -> id end)
+    |> Enum.sort()
   end
 
   @doc """

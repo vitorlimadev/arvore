@@ -655,6 +655,7 @@ defmodule EntitiesTest do
           class_ids ++ [school_id]
         end)
         |> List.flatten()
+        |> Enum.sort()
 
       # Create a second network. No parents from this one must be in the response.
       %{id: network_2_id} = insert(:entity, entity_type: "network")
@@ -691,7 +692,7 @@ defmodule EntitiesTest do
                }
              } = json_response(conn, 200)
 
-      assert Enum.sort(subtree_ids) == Enum.sort(subtree_ids_response)
+      assert subtree_ids == subtree_ids_response
     end
   end
 
