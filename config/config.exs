@@ -5,10 +5,6 @@ config :arvore,
 
 config :arvore, ArvoreWeb.Endpoint,
   url: [host: "localhost"],
-  render_errors: [
-    formats: [json: ArvoreWeb.ErrorJSON],
-    layout: false
-  ],
   pubsub_server: Arvore.PubSub,
   live_view: [signing_salt: "7Jfjdq4p"]
 
