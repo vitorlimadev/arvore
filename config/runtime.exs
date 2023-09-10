@@ -5,17 +5,11 @@ if System.get_env("PHX_SERVER") do
 end
 
 if config_env() == :prod do
-  username = System.fetch_env!("MYSQL_USERNAME")
-  password = System.fetch_env!("MYSQL_PASSWORD")
-  hostname = System.fetch_env!("MYSQL_HOSTNAME")
-  database = System.fetch_env!("MYSQL_DATABASE")
+  db_url = System.fetch_env!("JAWSDB_MARIA_URL")
 
   config :arvore, Arvore.Repo,
     ssl: true,
-    username: username,
-    password: password,
-    hostname: hostname,
-    database: database,
+    url: db_url,
     stacktrace: true,
     protocol: :tcp,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
@@ -28,11 +22,11 @@ if config_env() == :prod do
       You can generate one by calling: mix phx.gen.secret
       """
 
-  host = System.get_env("PHX_HOST") || "example.com"
   port = String.to_integer(System.get_env("PORT") || "4000")
 
   config :arvore, ArvoreWeb.Endpoint,
-    url: [host: host, port: 443, scheme: "https"],
+    url: [host: "vast-island-94364-a3d3b4324b8c.herokuapp.com", port: 443, scheme: "https"],
+    force_ssl: [rewrite_on: [:x_forwarded_proto]],
     http: [
       ip: {0, 0, 0, 0, 0, 0, 0, 0},
       port: port
