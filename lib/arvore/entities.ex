@@ -19,9 +19,9 @@ defmodule Arvore.Entities do
   """
 
   import Ecto.Query, warn: false
-  alias Arvore.Repo
 
   alias Arvore.Entities.Entity
+  alias Arvore.Repo
 
   @doc """
   Gets a single `Entity` and populate it's children's ids in `subtree_ids` virtual key.
